@@ -1,18 +1,34 @@
+import throttle from 'lodash.throttle';
 const form = document.querySelector('.feedback-form');
+const obj = JSON.parse(localStorage.getItem('feedback-form-state'));
 
-// if(localStorage.getItem('feedback-form-state').) {};
-form.addEventListener('input', setToLocaleStorage);
+if (obj) {
+  if (obj.email) {
+    form.email.value = obj.email;
+  }
+  if (obj.message) {
+    form.message.value = obj.message;
+  }
+}
 
-let obj = localStorage.getItem('feedback-form-state');
+form.addEventListener('input', throttle(setToLocaleStorage, 500));
+form.addEventListener('submit', clearFunction);
 
-form.email.value = JSON.parse(obj).email;
-form.message.value = JSON.parse(obj).message;
 const userValue = {};
 function setToLocaleStorage(event) {
   let inputName = event.target.name;
-
   userValue[inputName] = event.target.value;
   localStorage.setItem('feedback-form-state', JSON.stringify(userValue));
-  console.log(localStorage.getItem('feedback-form-state'));
   return;
+}
+
+function clearFunction(event) {
+  const result = {
+    email: form.email.value,
+    message: form.message.value,
+  };
+  console.log(result);
+  event.preventDefault();
+  form.reset();
+  localStorage.removeItem('feedback-form-state');
 }
